@@ -578,11 +578,21 @@ class BaseMySqlAdmin(object):
 
         return data_dict
 
-    def get_slave_status(self):
+    def get_slave_status(self, columns=None):
         """Get mysql database slave status."""
+        data_dict = {}
         with self.local_sql_client(self.mysql_app.get_engine()) as client:
-            data_list = client.execute('show slave status;')
-            data_dict = dict(data_list.__iter__())
+            rp = client.execute('show slave status;')
+            result = rp.first()
+            if result is None:
+                LOG.debug("There is no slave status records.")
+            else:
+                if columns is not None and isinstance(columns, list):
+                    for k in columns:
+                        if k in result:
+                            data_dict[k] = result[k]
+                else:
+                    data_dict = dict(result)
 
         return data_dict
 

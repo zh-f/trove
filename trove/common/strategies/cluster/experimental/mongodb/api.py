@@ -321,6 +321,14 @@ class MongoDbCluster(models.Cluster):
         """
         return self.type == "replica-set"
 
+    def allow_resize_flavor(self):
+        """
+        Same as allow_backup(), Only resize the instance which is the part of
+        a replica-set cluster
+        :return: bool
+        """
+        return self.type == "replica-set"
+
     def add_shard(self):
 
         if self.db_info.task_status != ClusterTasks.NONE:

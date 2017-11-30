@@ -26,6 +26,7 @@ class MysqlMeteringApp(MeteringApp):
                      'Innodb_buffer_pool_read_requests', 'Qcache_hits',
                      'Qcache_inserts', 'Threads_created', 'Threads_running',
                      'Com_select', 'Com_replace']
+    SLAVE_STATUS = ['Seconds_Behind_Master']
 
     def __init__(self, mysql_admin):
         self.mysql_admin = mysql_admin
@@ -35,7 +36,8 @@ class MysqlMeteringApp(MeteringApp):
             variable_names=self.GLOBAL_VARIABLES)
         mysql_status = self.mysql_admin().get_mysql_status(
             variable_names=self.GLOBAL_STATUS)
-        slave_status = self.mysql_admin().get_slave_status()
+        slave_status = self.mysql_admin().get_slave_status(
+            columns=self.SLAVE_STATUS)
 
         max_connections = mysql_variables.get('max_connections')
 

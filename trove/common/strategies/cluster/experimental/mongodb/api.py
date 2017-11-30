@@ -297,7 +297,7 @@ class MongoDbCluster(models.Cluster):
         Grow and add_shard action can not be performed on
         cluster of replica_set type currently
         '''
-        if self.type == "replica_set":
+        if self.type == "replica_set" and action not in ['reset-status']:
             msg = _("This action can not be performed on the cluster"
                     "type of replica_set only currently")
             raise exception.BadRequest(message=msg)

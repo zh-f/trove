@@ -1019,7 +1019,15 @@ class Instance(BuiltInstance):
                      "%(flavor_id)s."),
                  {'instance_id': self.id, 'flavor_id': new_flavor_id})
         if self.db_info.cluster_id is not None:
-            raise exception.ClusterInstanceOperationNotSupported()
+            """
+            Currently, only instance in MongoDB replica-set
+ +          cluster can execute resize. other cluster's instance cannot.
+            """
+            from trove.cluster.models import Cluster as DBCluster
+            cluster = DBCluster.load(self.context, self.db_info.cluster_id)
+            if not hasattr(cluster, "allow_resize_flavor") or \
+                    not cluster.allow_resize_flavor():
+                raise exception.ClusterInstanceOperationNotSupported()
 
         # Validate that the old and new flavor IDs are not the same, new flavor
         # can be found and has ephemeral/volume support if required by the

@@ -282,7 +282,7 @@ class MongoDbCluster(models.Cluster):
     def type(self):
         """
         Return the type of MongoDB cluster
-        sharding or replica-set,which supported currently
+        sharding or replica_set,which supported currently
         :return: string of cluster type
         """
         type_q = 'query_router'
@@ -290,16 +290,16 @@ class MongoDbCluster(models.Cluster):
                          if db_inst.type == type_q]
         if len(query_routers) > 0:
             return "sharding"
-        return "replica-set"
+        return "replica_set"
 
     def action(self, context, req, action, param):
         '''
         Grow and add_shard action can not be performed on
-        cluster of replica-set type currently
+        cluster of replica_set type currently
         '''
-        if self.type == "replica-set":
+        if self.type == "replica_set":
             msg = _("This action can not be performed on the cluster"
-                    "type of replica-set only currently")
+                    "type of replica_set only currently")
             raise exception.BadRequest(message=msg)
         if action == 'grow':
             context.notification = DBaaSClusterGrow(context, request=req)
@@ -316,10 +316,18 @@ class MongoDbCluster(models.Cluster):
     def allow_backup(self):
         """
         If sharding cluster, donot backup the instance which is the part of
-        cluster. Only allow backup replica-set cluster currently
+        cluster. Only allow backup replica_set cluster currently
         :return: bool
         """
-        return self.type == "replica-set"
+        return self.type == "replica_set"
+
+    def allow_resize_flavor(self):
+        """
+        Same as allow_backup(), Only resize the instance which is the part of
+        a replica_set cluster
+        :return: bool
+        """
+        return self.type == "replica_set"
 
     def add_shard(self):
 
